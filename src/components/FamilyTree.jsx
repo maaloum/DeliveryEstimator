@@ -498,12 +498,12 @@ export default function FamilyTree() {
             <div className="text-2xl font-bold">{treeStats.branches}</div>
             <div className="text-sm opacity-90">الفروع</div>
           </div>
-          <div className="rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 p-4 text-white shadow-lg">
+          {/* <div className="rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 p-4 text-white shadow-lg">
             <div className="text-2xl font-bold">
               {treeStats.membersWithValues}
             </div>
             <div className="text-sm opacity-90">مع القيم</div>
-          </div>
+          </div> */}
         </div>
 
         {/* Add Child Form */}

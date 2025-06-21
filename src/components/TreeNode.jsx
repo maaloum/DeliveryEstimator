@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 /* eslint-disable react/prop-types */
 const TreeNode = ({
@@ -12,6 +12,7 @@ const TreeNode = ({
 }) => {
   const [expanded, setExpanded] = useState(level < 2); // Auto-expand first 2 levels
   const [showContextMenu, setShowContextMenu] = useState(false);
+  const [showMobileActions, setShowMobileActions] = useState(false);
   const [editName, setEditName] = useState(node.name);
   const nodeRef = useRef(null);
 
@@ -19,6 +20,19 @@ const TreeNode = ({
   const hasChildren = node.children?.length > 0;
   const hasValue = node.value !== undefined;
   const isEditing = editingNode === node.id;
+
+  // Check if device is mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const getNodeColor = (level) => {
     const colors = [
@@ -33,17 +47,21 @@ const TreeNode = ({
 
   const handleContextMenu = (e) => {
     e.preventDefault();
-    setShowContextMenu(true);
+    if (!isMobile) {
+      setShowContextMenu(true);
+    }
   };
 
   const handleClickOutside = () => {
     setShowContextMenu(false);
+    setShowMobileActions(false);
   };
 
   const handleEdit = () => {
     setEditingNode(node.id);
     setEditName(node.name);
     setShowContextMenu(false);
+    setShowMobileActions(false);
   };
 
   const handleSaveEdit = () => {
@@ -64,6 +82,10 @@ const TreeNode = ({
     } else if (e.key === 'Escape') {
       handleCancelEdit();
     }
+  };
+
+  const toggleMobileActions = () => {
+    setShowMobileActions(!showMobileActions);
   };
 
   return (
@@ -129,6 +151,32 @@ const TreeNode = ({
               </div>
             )}
 
+            {/* Mobile Actions Toggle Button */}
+            {isMobile && !isEditing && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleMobileActions();
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                title="Actions"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  />
+                </svg>
+              </button>
+            )}
+
             {/* Edit indicator */}
             {isEditing && (
               <div className="flex gap-1">
@@ -150,8 +198,77 @@ const TreeNode = ({
             )}
           </div>
 
-          {/* Context Menu */}
-          {showContextMenu && (
+          {/* Mobile Actions Menu */}
+          {isMobile && showMobileActions && (
+            <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg bg-white p-2 shadow-xl ring-1 ring-black ring-opacity-5">
+              <button
+                onClick={handleEdit}
+                className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+                تعديل
+              </button>
+              <button
+                onClick={() => {
+                  onAddChild(node);
+                  setShowMobileActions(false);
+                }}
+                className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                إضافة أبناء
+              </button>
+              <button
+                onClick={() => {
+                  onRemove(node.id);
+                  setShowMobileActions(false);
+                }}
+                className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                حذف
+              </button>
+            </div>
+          )}
+
+          {/* Desktop Context Menu */}
+          {!isMobile && showContextMenu && (
             <div className="absolute right-0 top-full z-50 mt-1 rounded-lg bg-white p-2 shadow-xl ring-1 ring-black ring-opacity-5">
               <button
                 onClick={handleEdit}
@@ -239,8 +356,8 @@ const TreeNode = ({
         </div>
       )}
 
-      {/* Click outside to close context menu */}
-      {showContextMenu && (
+      {/* Click outside to close menus */}
+      {(showContextMenu || showMobileActions) && (
         <div className="fixed inset-0 z-40" onClick={handleClickOutside} />
       )}
     </div>
