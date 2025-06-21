@@ -1,3 +1,100 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Print styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .bg-gradient-to-br,
+  .bg-gradient-to-r {
+    background: white !important;
+  }
+
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  /* Hide non-essential elements when printing */
+  button,
+  input,
+  select {
+    display: none !important;
+  }
+
+  /* Ensure text is readable */
+  .text-transparent {
+    color: black !important;
+  }
+
+  /* Simplify tree structure for print */
+  .border-dashed {
+    border-style: solid !important;
+  }
+
+  /* Remove hover effects */
+  .hover\:shadow-md:hover,
+  .hover\:border-blue-300:hover {
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+}
+
+/* Context menu animations */
+.context-menu-enter {
+  opacity: 0;
+  transform: scale(0.95) translateY(-10px);
+}
+
+.context-menu-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+}
+
+.context-menu-exit {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.context-menu-exit-active {
+  opacity: 0;
+  transform: scale(0.95) translateY(-10px);
+  transition:
+    opacity 150ms ease-in,
+    transform 150ms ease-in;
+}
+
+/* Tree node hover effects */
+.tree-node {
+  transition: all 0.2s ease-in-out;
+}
+
+.tree-node:hover {
+  transform: translateY(-1px);
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
